@@ -1,0 +1,14 @@
+%{
+	#include<iostream>
+	enum Token {Keyword, Identifier, Operator, Constant};
+	
+%}
+%option noyywrap
+%%
+
+%%
+
+int main()
+{
+	yylex();
+}
