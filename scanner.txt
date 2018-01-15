@@ -1,7 +1,14 @@
 %{
 	#include<iostream>
-	enum Token {Keyword, Identifier, Operator, Constant};
+	#include<string>
+	enum Token {Keyword, Identifier, Operator, Literal};
 	
+	union {
+		int integer;
+		char character;
+		std::string string;
+	} typedef Lexeme;
+
 %}
 %option noyywrap
 %%
