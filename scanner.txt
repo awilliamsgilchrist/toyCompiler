@@ -1,17 +1,12 @@
 %{
 	#include<iostream>
-	#include<string>
-	enum Token {Keyword, Identifier, Operator, Literal};
-	
-	union {
-		int integer;
-		char character;
-		std::string string;
-	} typedef Lexeme;
 
 %}
 %option noyywrap
 %%
+
+"array"|"ARRAY" { std::cout << "Keyword(" << yytext << ")" << std::endl; }
+
 
 %%
 

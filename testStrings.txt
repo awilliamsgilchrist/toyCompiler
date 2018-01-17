@@ -1,0 +1,4 @@
+$To use this file, use command cat testStrings.txt | ./Scanner
+
+array
+ARRAY
