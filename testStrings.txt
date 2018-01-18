@@ -1,4 +1,8 @@
 $To use this file, use command cat testStrings.txt | ./Scanner
+$array
 
+
+elseif else
+elseARRAY
 array
-ARRAY
+array

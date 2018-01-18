@@ -1,12 +1,47 @@
 %{
 	#include<iostream>
+	#include<string>
 
+	void flProcess(std::string type)
+	{
+		std::cout << type << "(" << yytext << ")" << std::endl;
+	}
 %}
 %option noyywrap
 %%
 
-"array"|"ARRAY" { std::cout << "Keyword(" << yytext << ")" << std::endl; }
-
+\$.* { std::cout << "Comment" << std::endl; }
+"array"|"ARRAY" { flProcess("Keyword"); }
+"begin"|"BEGIN" { flProcess("Keyword"); }
+"chr"|"CHR" { flProcess("Keyword"); }
+"const"|"CONST" { flProcess("Keyword"); }
+"do"|"DO" { flProcess("Keyword"); }
+"downto"|"DOWNTO" { flProcess("Keyword"); }
+"else"|"ELSE" { flProcess("Keyword"); }
+"elseif"|"ELSEIF" { flProcess("Keyword"); } 
+"end"|"END" { flProcess("Keyword"); }
+"for"|"FOR" { flProcess("Keyword"); }
+"forward"|"FORWARD" { flProcess("Keyword"); }
+"function"|"FUNCTION" { flProcess("Keyword"); }
+"if"|"IF" { flProcess("Keyword"); }
+"of"|"OF" { flProcess("Keyword"); }
+"ord"|"ORD" { flProcess("Keyword"); }
+"pred"|"PRED" { flProcess("Keyword"); }
+"procedure"|"PROCEDURE" { flProcess("Keyword"); }
+"read"|"READ" { flProcess("Keyword"); }
+"record"|"RECORD" { flProcess("Keyword"); }
+"ref"|"REF" { flProcess("Keyword"); }
+"repeat"|"REPEAT" { flProcess("Keyword"); }
+"return"|"RETURN" { flProcess("Keyword"); }
+"stop"|"STOP" { flProcess("Keyword"); }
+"succ"|"SUCC" { flProcess("Keyword"); }
+"then"|"THEN" { flProcess("Keyword"); }
+"to"|"TO" { flProcess("Keyword"); }
+"type"|"TYPE" { flProcess("Keyword"); }
+"until"|"UNTIL" { flProcess("Keyword"); }
+"var"|"VAR" { flProcess("Keyword"); }
+"while"|"WHILE" { flProcess("Keyword"); }
+"write"|"WRITE" { flProcess("Keyword"); }
 
 %%
 
