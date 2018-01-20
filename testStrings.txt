@@ -5,16 +5,20 @@ arrayList
 Empty
 after_me
 
-elseif+else
+_
+
+elseif + else
 elseARRAY
 array
 array
 a1
--*/&|'=<><<=>=.,:;()[]:=%
+- * /&|'=<><<=>=.,:;()[]:=%
 0347
 0x1AF2
 12345
 0
 '4'
 '\n'
-'\aw'
+"hello"
+	""
+ "Hi \n there"

@@ -2,15 +2,20 @@
 	#include<iostream>
 	#include<string>
 
+	
+
 	void flProcess(std::string type)
 	{
-		std::cout << type << "(" << yytext << ")" << std::endl;
+		if(type != "Null")
+		{
+			std::cout << type << "(" << yytext << ")" << std::endl;
+		}
 	}
 %}
 %option noyywrap
 %%
 
-\$.* { std::cout << "Comment" << std::endl; }
+\$.* { flProcess("Null"); }
 "array"|"ARRAY" { flProcess("Keyword"); }
 "begin"|"BEGIN" { flProcess("Keyword"); }
 "chr"|"CHR" { flProcess("Keyword"); }
@@ -64,6 +69,12 @@
 '.' {flProcess("Char"); }
 '\\[nrbtf]' { flProcess("Char"); }
 
+\".*\" { flProcess("String"); }
+
+" "|"\t" { flProcess("Null"); }
+"\n" { flProcess("Null"); }
+
+. { flProcess("Error"); }
 
 %%
 
