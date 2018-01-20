@@ -57,6 +57,12 @@
 "]" { flProcess("Operator"); }
 ":="|"%" { flProcess("Operator"); }
 
+[1-9][0-9]* { flProcess("Int"); }
+0x[0-9A-F]+ { flProcess("Int"); }
+[0-7]+ {flProcess("Int"); }
+
+'.' {flProcess("Char"); }
+'\\[nrbtf]' { flProcess("Char"); }
 
 
 %%
