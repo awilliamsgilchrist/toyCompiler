@@ -1,8 +1,13 @@
 $To use this file, use command cat testStrings.txt | ./Scanner
 $array
 
+arrayList
+Empty
+after_me
 
-elseif else
+elseif+else
 elseARRAY
 array
 array
+a1
+-*/&|'=<><<=>=.,:;()[]:=%
