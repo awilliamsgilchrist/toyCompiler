@@ -6,6 +6,7 @@
 {
 	int numVal;
 	char charVal;
+	char* stringVal;
 }
 
 %token ARRAY
@@ -13,4 +14,60 @@
 %token CHR
 %token CONST
 %token DO
+%token DOWNTO
+%token ELSE
+%token ELSEIF
+%token END
+%token FOR
+%token FORWARD
+%token FUNCTION
+%token IF
+%token OF
+%token ORD
+%token PRED
+%token PROCEDURE
+%token READ
+%token RECORD
+%token REF
+%token REPEAT
+%token RETURN
+%token STOP
+%token SUCC
+%token THEN
+%token TO
+%token TYPE
+%token UNTIL
+%token VAR
+%token WHILE
+%token WRITE
+%token <stringVal> IDENTIFIER
+%token ADD
+%token SUB
+%token MULT
+%token DIV
+%token AND
+%token OR
+%token TILDE
+%token EQUAL
+%token ANGLEBRACK
+%token LESS
+%token LESS_EQ
+%token GREAT
+%token GREAT_EQ
+%token DOT
+%token COMMA
+%token COLON
+%token SEMICOLON
+%token OPEN_PAR
+%token CLOSE_PAR
+%token OPEN_SQR
+%token CLOSE_SQR
+%token ASSIGN
+%token MOD
+
+Program : ConstantDecl ? TypeDecl ? VarDecl ? (ProcedureDecl | FunctionDecl)* Block
+	;
+
+ConstantDecl : CONST (IDENTIFIER EQUAL Expression SEMICOLON)+
+	     ;
 

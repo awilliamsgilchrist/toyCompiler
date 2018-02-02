@@ -16,51 +16,62 @@
 %%
 
 \$.* { flProcess("Null"); }
-"array"|"ARRAY" { flProcess("Keyword"); }
-"begin"|"BEGIN" { flProcess("Keyword"); }
-"chr"|"CHR" { flProcess("Keyword"); }
-"const"|"CONST" { flProcess("Keyword"); }
-"do"|"DO" { flProcess("Keyword"); }
-"downto"|"DOWNTO" { flProcess("Keyword"); }
-"else"|"ELSE" { flProcess("Keyword"); }
-"elseif"|"ELSEIF" { flProcess("Keyword"); } 
-"end"|"END" { flProcess("Keyword"); }
-"for"|"FOR" { flProcess("Keyword"); }
-"forward"|"FORWARD" { flProcess("Keyword"); }
-"function"|"FUNCTION" { flProcess("Keyword"); }
-"if"|"IF" { flProcess("Keyword"); }
-"of"|"OF" { flProcess("Keyword"); }
-"ord"|"ORD" { flProcess("Keyword"); }
-"pred"|"PRED" { flProcess("Keyword"); }
-"procedure"|"PROCEDURE" { flProcess("Keyword"); }
-"read"|"READ" { flProcess("Keyword"); }
-"record"|"RECORD" { flProcess("Keyword"); }
-"ref"|"REF" { flProcess("Keyword"); }
-"repeat"|"REPEAT" { flProcess("Keyword"); }
-"return"|"RETURN" { flProcess("Keyword"); }
-"stop"|"STOP" { flProcess("Keyword"); }
-"succ"|"SUCC" { flProcess("Keyword"); }
-"then"|"THEN" { flProcess("Keyword"); }
-"to"|"TO" { flProcess("Keyword"); }
-"type"|"TYPE" { flProcess("Keyword"); }
-"until"|"UNTIL" { flProcess("Keyword"); }
-"var"|"VAR" { flProcess("Keyword"); }
-"while"|"WHILE" { flProcess("Keyword"); }
-"write"|"WRITE" { flProcess("Keyword"); }
+"array"|"ARRAY" { return ARRAY; }
+"begin"|"BEGIN" { return BEGIN; }
+"chr"|"CHR" { return CHR; }
+"const"|"CONST" { return CONST; }
+"do"|"DO" { return DO; }
+"downto"|"DOWNTO" { return DOWNTO; }
+"else"|"ELSE" { return ELSE; }
+"elseif"|"ELSEIF" { return ELSEIF; } 
+"end"|"END" { return END; }
+"for"|"FOR" { return FOR; }
+"forward"|"FORWARD" { return FORWARD; }
+"function"|"FUNCTION" { return FUNCTION; }
+"if"|"IF" { return IF; }
+"of"|"OF" { return OF; }
+"ord"|"ORD" { return ORD; }
+"pred"|"PRED" { return PRED; }
+"procedure"|"PROCEDURE" { return PROCEDURE; }
+"read"|"READ" { return READ; }
+"record"|"RECORD" { return RECORD; }
+"ref"|"REF" { return REF; }
+"repeat"|"REPEAT" { return REPEAT; }
+"return"|"RETURN" { return RETURN; }
+"stop"|"STOP" { return STOP; }
+"succ"|"SUCC" { return SUCC; }
+"then"|"THEN" { return THEN; }
+"to"|"TO" { return TO; }
+"type"|"TYPE" { return TYPE; }
+"until"|"UNTIL" { return UNTIL; }
+"var"|"VAR" { return VAR; }
+"while"|"WHILE" { return WHILE; }
+"write"|"WRITE" { return WRITE; }
 
 [a-zA-Z][a-zA-Z0-9_]* { flProcess("Identifier"); }
-"+"|"-" {flProcess("Operator"); }
-"*"|"/" { flProcess("Operator"); }
-"&"|"|" { flProcess("Operator"); }
-"'"|"=" { flProcess("Operator"); }
-"<>"|"<" { flProcess("Operator"); }
-"<="|">" { flProcess("Operator"); }
-">="|"." { flProcess("Operator"); }
-","|":" { flProcess("Operator"); }
-";"|"(" { flProcess("Operator"); }
-")"|"[" { flProcess("Operator"); }
-"]" { flProcess("Operator"); }
-":="|"%" { flProcess("Operator"); }
+"+" {return ADD; }
+"-" {return SUB; }
+"*" {return MULT; }
+"/" {return DIV; }
+"&" {return AND; }
+"|" {return OR; }
+"~" {return TILDE; }
+"=" {return EQUAL; }
+"<>" {return ANGLEBRACK; }
+"<" {return LESS; }
+"<=" {return LESS_EQ; }
+">" { return GREAT; }
+">=" {return GREAT_EQ; }
+"." { return DOT; }
+"," {return COMMA; }
+":" { return COLON; }
+";" {return SEMICOLON; }
+"(" { return OPEN_PAR; }
+")" {return CLOSE_PAR; }
+"[" { return OPEN_SQR; }
+"]" { return CLOSE_SQR; }
+":=" {return ASSIGN; }
+"%" { return MOD; }
 
 [1-9][0-9]* { flProcess("Int"); }
 0x[0-9A-F]+ { flProcess("Int"); }
