@@ -65,9 +65,146 @@
 %token ASSIGN
 %token MOD
 
-Program : ConstantDecl ? TypeDecl ? VarDecl ? (ProcedureDecl | FunctionDecl)* Block
+%token <numVal> NUM
+
+Program : ConstantDecl? TypeDecl? VarDecl? (ProcedureDecl | FunctionDecl)* Block
 	;
 
 ConstantDecl : CONST (IDENTIFIER EQUAL Expression SEMICOLON)+
 	     ;
 
+ProcedureDecl : PROCEDURE IDENTIFIER OPEN_PAR FormalParameters CLOSE_PAR SEMICOLON FORWARD SEMICOLON
+	      | PROCEDURE IDENTIFIER OPEN_PAR FormalParameters CLOSE_PAR SEMICOLON Body SEMICOLON
+	      ;
+
+FunctionDecl : FUNCTION IDENTIFIER OPEN_PAR FormalParameters CLOSE_PAR COLON Type SEMICOLON FORWARD SEMICOLON
+	     | FUNCTION IDENTIFIER OPEN_PAR FormalParameters CLOSE_PAR COLON Type SEMICOLON Body SEMICOLON
+	     ;
+
+FormalParameters : %empty
+		 | (VAR|REF)? IdentList COLON Type (SEMICOLON (VAR|REF)? IdentList COLON Type)*
+		 ;
+
+Body : ConstantDecl? TypeDecl? VarDecl? Block
+     ;
+
+Block : BEGIN StatementSequence END
+      ;
+
+TypeDecl : TYPE (IDENTIFIER EQUAL Type SEMICOLON)+
+         ;
+
+Type : SimpleType
+     | RecordType
+     | ArrayType
+     ;
+
+SimpleType : IDENTIFIER
+	   ;
+
+RecordType : RECORD (IdentList COLON Type SEMICOLON)* END
+	   ;
+
+ArrayType : ARRAY OPEN_SQR Expression COLON Expression CLOSE_SQR OF Type
+	  ;
+
+IdentList : IDENTIFIER (COMMA IDENTIFIER)*
+	  ;
+
+VarDecl : VAR (IdentList COLON Type SEMICOLON)*
+	;
+
+StatementSequence : Statement ( SEMICOLON Statement)*
+		  ;
+
+Statement : Assignment
+	  | IfStatement
+	  | WhileStatement
+	  | RepeatStatement
+	  | ForStatement
+	  | StopStatement
+	  | ReturnStatement
+	  | ReadStatement
+	  | WriteStatement
+	  | ProcedureCall
+	  | NullStatement
+	  ;
+
+Assignment : LValue ASSIGN Expression
+	   ;
+
+IfStatement : IF Expression THEN StatementSequence (ELSEIF Expression THEN StatementSequence)* (ELSE StatementSequence) END
+	    ;
+
+WhileStatement : WHILE Expression DO StatementSequence END
+	       ;
+
+RepeatStatement : REPEAT Expression DO StatementSequence END
+		;
+
+ForStatement : FOR IDENTIFIER ASSIGN Expression TO|DOWNTO Expression DO StatementSequence END
+	     ;
+
+StopStatement : STOP
+	      ;
+
+ReturnStatement : RETURN Expression?
+		;
+
+ReadStatement : READ OPEN_PAR LValue (COMMA LValue)* CLOSE_PAR
+	      ;
+
+WriteStatement : WRITE OPEN_PAR Expression (COMMA Expression)* CLOSE_PAR
+	       ;
+
+ProcedureCall : IDENTIFIER OPEN_PAR (Expression (COMMA Expression)*)? CLOSE_PAR
+	      ;
+
+NullStatement : %empty
+	      ;
+
+Expression : ExpressionOne
+	   | CHR OPEN_PAR Expression CLOSE_PAR
+	   | ORD OPEN_PAR Expression CLOSE_PAR
+	   | PRED OPEN_PAR Expression CLOSE_PAR
+	   | SUCC OPEN_PAR Expression CLOSE_PAR
+	   | LValue
+	   ;
+
+ExpressionOne : (ExpressionTwo | ExpressionOne) OR (ExpressionTwo | ExpressionOne) {$$ = $1 || $3;}
+	      | ExpressionTwo {$$ = $1;}
+	      ;
+
+ExpressionTwo : (ExpressionTwo | ExpressionThree) AND (ExpressionTwo | ExpressionThree) {$$ = $1 && $3;}
+	      | ExpressionThree {$$ = $1};
+
+ExpressionThree : TILDE (ExpressionFour | ExpressionThree) {$$ = !$2;}
+	        | ExpressionFour {$$ = $1;}
+		;
+
+ExpressionFour : (ExpressionFive | ExpressionFour) EQUAL (ExpressionFive | ExpressionFour) {$$ = $1 == $3;}
+	       | (ExpressionFive | ExpressionFour) ANGLEBRACK (ExpressionFive | ExpressionFour) {$$ = $1 != $3;}
+	       | (ExpressionFive | ExpressionFour) LESS (ExpressionFive | ExpressionFour) {$$ = $1 < $3;}
+	       | (ExpressionFive | ExpressionFour) LESS_EQ (ExpressionFive | ExpressionFour) {$$ = $1 <= $3;}
+	       | (ExpressionFive | ExpressionFour) GREAT (ExpressionFive | ExpressionFour) {$$ = $1 > $3;}
+	       | (ExpressionFive | ExpressionFour) GREAT_EQ (ExpressionFive | ExpressionFour) {$$ = $1 >= $3;}
+	       | ExpressionFive {$$ = $1;}
+	       ;
+
+ExpressionFive : (ExpressionSix | ExpressionFive) ADD (ExpressionSix | ExpressionFive) {$$ = $1 + $3;}
+	       | (ExpressionSix | ExpressionFive) SUB (ExpressionSix | ExpressionFive) {$$ = $1 - $3;}
+	       | ExpressionSix {$$ = $1;}
+	       ;
+
+ExpressionSix : (ExpressionSeven | ExpressionSix) MULT (ExpressionSeven | ExpressionSix) {$$ = $1 * $3;}
+	      | (ExpressionSeven | ExpressionSix) DIV (ExpressionSeven | ExpressionSix) {$$ = $1 / $3;}
+	      | (ExpressionSeven | ExpressionSix) MOD (ExpressionSeven | ExpressionSix) {$$ = $1 % $3;}
+	      | ExpressionSeven {$$ = $1;}
+	      ;
+
+ExpressionSeven : SUB NUM { $$ = $2 * -1;}
+		| NUM { $$ = $1;}
+		;
+
+LValue : IDENTIFIER ((DOT IDENTIFIER)|(OPEN_SQR Expression CLOSE_SQR))*
+       ;
