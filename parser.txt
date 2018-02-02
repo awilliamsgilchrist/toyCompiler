@@ -1,0 +1,16 @@
+%{
+#include <iostream>
+%}
+
+%union
+{
+	int numVal;
+	char charVal;
+}
+
+%token ARRAY
+%token BEGIN
+%token CHR
+%token CONST
+%token DO
+
