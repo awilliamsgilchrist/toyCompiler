@@ -67,10 +67,31 @@
 
 %token <numVal> NUM
 
-Program : ConstantDecl? TypeDecl? VarDecl? (ProcedureDecl | FunctionDecl)* Block
+Program : OptCNull OptTNull OptVNull OptPFNull Block
 	;
 
-ConstantDecl : CONST (IDENTIFIER EQUAL Expression SEMICOLON)+
+OptCNull : ConstantDecl
+         | %empty
+         ;
+
+OptTNull : TypeDecl
+         | %empty
+         ;
+
+OptVNull : VarDecl
+         | %empty
+         ;
+
+OptPFNull : ProcedureDecl OptPF
+          | FunctionDecl OptPF
+          | %empty
+          ;
+
+ConstantDecl : CONST ConStatement
+	     ;
+
+ConStatement : IDENTIFIER EQUAL Expression SEMICOLON
+	     | ConStatement ConStatement
 	     ;
 
 ProcedureDecl : PROCEDURE IDENTIFIER OPEN_PAR FormalParameters CLOSE_PAR SEMICOLON FORWARD SEMICOLON
@@ -82,17 +103,30 @@ FunctionDecl : FUNCTION IDENTIFIER OPEN_PAR FormalParameters CLOSE_PAR COLON Typ
 	     ;
 
 FormalParameters : %empty
-		 | (VAR|REF)? IdentList COLON Type (SEMICOLON (VAR|REF)? IdentList COLON Type)*
+		 | OptVRNull IdentList COLON Type ForParStar
 		 ;
 
-Body : ConstantDecl? TypeDecl? VarDecl? Block
+ForParStar : SEMICOLON OptVRNull IdentList COLON Type ForParStar
+	   | %empty
+	   ;
+
+OptVRNull : VAR
+          | REF
+          | %empty
+          ;
+
+Body : OptCNull OptTNull OptVNull Block
      ;
 
 Block : BEGIN StatementSequence END
       ;
 
-TypeDecl : TYPE (IDENTIFIER EQUAL Type SEMICOLON)+
+TypeDecl : TYPE TypDecPlus
          ;
+
+TypDecPlus : IDENTIFIER EQUAL Type SEMICOLON
+	   | TypDecPlus TypDecPlus
+	   ;
 
 Type : SimpleType
      | RecordType
@@ -102,20 +136,36 @@ Type : SimpleType
 SimpleType : IDENTIFIER
 	   ;
 
-RecordType : RECORD (IdentList COLON Type SEMICOLON)* END
+RecordType : RECORD RecTypStar END
+	   ;
+
+RecTypStar : IdentList COLON Type SEMICOLON RecTypStar
+	   | %empty
 	   ;
 
 ArrayType : ARRAY OPEN_SQR Expression COLON Expression CLOSE_SQR OF Type
 	  ;
 
-IdentList : IDENTIFIER (COMMA IDENTIFIER)*
+IdentList : IDENTIFIER IdeLisStar
 	  ;
 
-VarDecl : VAR (IdentList COLON Type SEMICOLON)*
+IdeLisStar : COMMA IDENTIFIER IdeLisStar
+	   | %empty
+	   ;
+
+VarDecl : VAR VarDecStar
 	;
 
-StatementSequence : Statement ( SEMICOLON Statement)*
+VarDecStar : IdentList COLON Type SEMICOLON VarDecStar
+	   | %empty
+	   ;
+
+StatementSequence : Statement StaSeqStar
 		  ;
+
+StaSeqStar : SEMICOLON Statement StaSeqStar
+	   | %empty
+	   ;
 
 Statement : Assignment
 	  | IfStatement
@@ -133,8 +183,12 @@ Statement : Assignment
 Assignment : LValue ASSIGN Expression
 	   ;
 
-IfStatement : IF Expression THEN StatementSequence (ELSEIF Expression THEN StatementSequence)* (ELSE StatementSequence) END
+IfStatement : IF Expression THEN StatementSequence IfStaStar ELSE StatementSequence END
 	    ;
+
+IfStaStar : ELSEIF Expression THEN StatementSequence IfStaStar
+	  | %empty
+	  ;
 
 WhileStatement : WHILE Expression DO StatementSequence END
 	       ;
@@ -142,23 +196,43 @@ WhileStatement : WHILE Expression DO StatementSequence END
 RepeatStatement : REPEAT Expression DO StatementSequence END
 		;
 
-ForStatement : FOR IDENTIFIER ASSIGN Expression TO|DOWNTO Expression DO StatementSequence END
+ForStatement : FOR IDENTIFIER ASSIGN Expression TDOr Expression DO StatementSequence END
 	     ;
+
+TDOr : TO
+     | DOWNTO
+     ;
 
 StopStatement : STOP
 	      ;
 
-ReturnStatement : RETURN Expression?
+ReturnStatement : RETURN OptENull
 		;
 
-ReadStatement : READ OPEN_PAR LValue (COMMA LValue)* CLOSE_PAR
+OptENull : Expression
+	 | %empty
+	 ;
+
+ReadStatement : READ OPEN_PAR LValue ReaStaStar CLOSE_PAR
 	      ;
 
-WriteStatement : WRITE OPEN_PAR Expression (COMMA Expression)* CLOSE_PAR
+ReaStaStar : COMMA LValue ReaStaStar
+	   | %empty
+	   ;
+
+WriteStatement : WRITE OPEN_PAR Expression WriStaStar CLOSE_PAR
 	       ;
 
-ProcedureCall : IDENTIFIER OPEN_PAR (Expression (COMMA Expression)*)? CLOSE_PAR
+WriStaStar : COMMA Expression WriStaStar
+	   | %empty
+	   ;
+
+ProcedureCall : IDENTIFIER OPEN_PAR OptPNull CLOSE_PAR
 	      ;
+
+OptPNull : Expression WriStaStar
+	 | %empty
+	 ;
 
 NullStatement : %empty
 	      ;
@@ -171,34 +245,34 @@ Expression : ExpressionOne
 	   | LValue
 	   ;
 
-ExpressionOne : (ExpressionTwo | ExpressionOne) OR (ExpressionTwo | ExpressionOne) {$$ = $1 || $3;}
+ExpressionOne : ExpressionOne OR ExpressionOne {$$ = $1 || $3;}
 	      | ExpressionTwo {$$ = $1;}
 	      ;
 
-ExpressionTwo : (ExpressionTwo | ExpressionThree) AND (ExpressionTwo | ExpressionThree) {$$ = $1 && $3;}
+ExpressionTwo : ExpressionTwo AND ExpressionTwo {$$ = $1 && $3;}
 	      | ExpressionThree {$$ = $1};
 
-ExpressionThree : TILDE (ExpressionFour | ExpressionThree) {$$ = !$2;}
+ExpressionThree : TILDE ExpressionThree {$$ = !$2;}
 	        | ExpressionFour {$$ = $1;}
 		;
 
-ExpressionFour : (ExpressionFive | ExpressionFour) EQUAL (ExpressionFive | ExpressionFour) {$$ = $1 == $3;}
-	       | (ExpressionFive | ExpressionFour) ANGLEBRACK (ExpressionFive | ExpressionFour) {$$ = $1 != $3;}
-	       | (ExpressionFive | ExpressionFour) LESS (ExpressionFive | ExpressionFour) {$$ = $1 < $3;}
-	       | (ExpressionFive | ExpressionFour) LESS_EQ (ExpressionFive | ExpressionFour) {$$ = $1 <= $3;}
-	       | (ExpressionFive | ExpressionFour) GREAT (ExpressionFive | ExpressionFour) {$$ = $1 > $3;}
-	       | (ExpressionFive | ExpressionFour) GREAT_EQ (ExpressionFive | ExpressionFour) {$$ = $1 >= $3;}
+ExpressionFour : ExpressionFour EQUAL ExpressionFour {$$ = $1 == $3;}
+	       | ExpressionFour ANGLEBRACK ExpressionFour {$$ = $1 != $3;}
+	       | ExpressionFour LESS ExpressionFour {$$ = $1 < $3;}
+	       | ExpressionFour LESS_EQ ExpressionFour {$$ = $1 <= $3;}
+	       | ExpressionFour GREAT ExpressionFour {$$ = $1 > $3;}
+	       | ExpressionFour GREAT_EQ ExpressionFour {$$ = $1 >= $3;}
 	       | ExpressionFive {$$ = $1;}
 	       ;
 
-ExpressionFive : (ExpressionSix | ExpressionFive) ADD (ExpressionSix | ExpressionFive) {$$ = $1 + $3;}
-	       | (ExpressionSix | ExpressionFive) SUB (ExpressionSix | ExpressionFive) {$$ = $1 - $3;}
+ExpressionFive : ExpressionFive ADD ExpressionFive {$$ = $1 + $3;}
+	       | ExpressionFive SUB ExpressionFive {$$ = $1 - $3;}
 	       | ExpressionSix {$$ = $1;}
 	       ;
 
-ExpressionSix : (ExpressionSeven | ExpressionSix) MULT (ExpressionSeven | ExpressionSix) {$$ = $1 * $3;}
-	      | (ExpressionSeven | ExpressionSix) DIV (ExpressionSeven | ExpressionSix) {$$ = $1 / $3;}
-	      | (ExpressionSeven | ExpressionSix) MOD (ExpressionSeven | ExpressionSix) {$$ = $1 % $3;}
+ExpressionSix : ExpressionSix MULT ExpressionSix {$$ = $1 * $3;}
+	      | ExpressionSix DIV ExpressionSix {$$ = $1 / $3;}
+	      | ExpressionSix MOD ExpressionSix {$$ = $1 % $3;}
 	      | ExpressionSeven {$$ = $1;}
 	      ;
 
@@ -206,5 +280,13 @@ ExpressionSeven : SUB NUM { $$ = $2 * -1;}
 		| NUM { $$ = $1;}
 		;
 
-LValue : IDENTIFIER ((DOT IDENTIFIER)|(OPEN_SQR Expression CLOSE_SQR))*
+LValue : IDENTIFIER LValStar
        ;
+
+LValStar : OptLVal LValStar
+	 | %empty
+	 ;
+
+OptLVal : DOT IDENTIFIER
+	| OPEN_SQR Expression CLOSE_SQR
+	;
