@@ -67,6 +67,15 @@
 
 %token <numVal> NUM
 
+%type <numVal> Expression
+%type <numVal> ExpressionOne
+%type <numVal> ExpressionTwo
+%type <numVal> ExpressionThree
+%type <numVal> ExpressionFour
+%type <numVal> ExpressionFive
+%type <numVal> ExpressionSix
+%type <numVal> ExpressionSeven
+
 %%
 
 Program : OptCNull OptTNull OptVNull OptPFNull Block
@@ -84,8 +93,8 @@ OptVNull : VarDecl
          | %empty
          ;
 
-OptPFNull : ProcedureDecl OptPF
-          | FunctionDecl OptPF
+OptPFNull : ProcedureDecl OptPFNull
+          | FunctionDecl OptPFNull
           | %empty
           ;
 
