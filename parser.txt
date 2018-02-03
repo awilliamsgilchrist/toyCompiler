@@ -68,6 +68,22 @@ extern in yylex();
 
 %token <numVal> NUM
 
+%left ADD
+%left SUB
+%left MULT
+%left DIV
+%left OR
+%left AND
+
+%nonassoc EQUAL
+%nonassoc ANGLEBRACK
+%nonassoc LESS
+%nonassoc LESS_EQ
+%nonassoc GREAT
+%nonassoc GREAT_EQ
+
+%right TILDE
+
 %type <numVal> Expression
 %type <numVal> ExpressionOne
 %type <numVal> ExpressionTwo
