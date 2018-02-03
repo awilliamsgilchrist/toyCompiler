@@ -67,6 +67,8 @@
 
 %token <numVal> NUM
 
+%%
+
 Program : OptCNull OptTNull OptVNull OptPFNull Block
 	;
 
